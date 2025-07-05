@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { exec } from 'child_process';
+import { openGitPanel } from './webview'; 
 
 export function activate(context: vscode.ExtensionContext) {
   let disposable = vscode.commands.registerCommand('extension.generateCommit', () => {
@@ -22,7 +23,7 @@ export function activate(context: vscode.ExtensionContext) {
               if (addErr) {
                 vscode.window.showErrorMessage('Failed to stage changes.');
               } else {
-                generateCommit(cwd); 
+                generateCommit(cwd);
               }
             });
           } else {
@@ -36,6 +37,12 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   context.subscriptions.push(disposable);
+
+  let uiCmd = vscode.commands.registerCommand('extension.openGitUI', () => {
+    openGitPanel(context);
+  });
+
+  context.subscriptions.push(uiCmd);
 }
 
 function generateCommit(cwd: string) {
