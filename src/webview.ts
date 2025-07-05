@@ -65,6 +65,16 @@ export function openGitPanel(context: vscode.ExtensionContext) {
         });
         break;
       }
+      case 'pushChanges': {
+        exec(`git push -u origin main`, { cwd }, (err, stdout, stderr) => {
+          if (err) {
+            panel.webview.postMessage({ status: 'push-failed', error: stderr });
+          } else {
+            panel.webview.postMessage({ status: 'push-success' });
+          }
+        });
+        break;
+      }
     }
   });
 }
