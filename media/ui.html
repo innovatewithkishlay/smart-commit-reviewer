@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Git Assistant</title>
   <style>
     body {
@@ -12,13 +12,15 @@
     h2 {
       color: #007acc;
     }
-    button, input {
+    button, input, textarea {
       padding: 8px 12px;
       margin-top: 10px;
       margin-bottom: 8px;
       border: 1px solid #ccc;
       border-radius: 4px;
       display: block;
+      width: 100%;
+      box-sizing: border-box;
     }
     button {
       background-color: #007acc;
@@ -58,6 +60,10 @@
   <div id="changes-section" style="display: none;">
     <h3>📄 Changed Files:</h3>
     <ul id="changedFiles"></ul>
+
+    <label for="commitMessage">✍️ Commit Message</label>
+    <textarea id="commitMessage" rows="2"></textarea>
+    <button id="commitBtn">Commit Now</button>
     <button id="pushBtn">Push to GitHub</button>
   </div>
 
@@ -72,6 +78,9 @@
     const output = document.getElementById("output");
     const changesSection = document.getElementById("changes-section");
     const changedFiles = document.getElementById("changedFiles");
+    const commitTextarea = document.getElementById("commitMessage");
+
+    let lastFilesChanged = [];
 
     document.getElementById("checkGitBtn").onclick = () => {
       output.innerText = "";
@@ -96,6 +105,12 @@
       output.innerText = "Setting branch to main...";
     };
 
+    document.getElementById("commitBtn").onclick = () => {
+      const message = commitTextarea.value.trim();
+      vscode.postMessage({ command: "commitChanges", commitMessage: message });
+      output.innerText = "Committing...";
+    };
+
     document.getElementById("pushBtn").onclick = () => {
       vscode.postMessage({ command: "pushChanges" });
       output.innerText = "Pushing to GitHub...";
@@ -116,9 +131,19 @@
         initOptions.style.display = "none";
         repoSetup.style.display = "none";
         changesSection.style.display = "block";
-        changedFiles.innerHTML = msg.changes.length
-          ? msg.changes.map(c => `<li>${c}</li>`).join('')
+
+        lastFilesChanged = msg.changes || [];
+
+        changedFiles.innerHTML = lastFilesChanged.length
+          ? lastFilesChanged.map(f => `<li>${f}</li>`).join('')
           : "<li>No changes detected</li>";
+
+        if (lastFilesChanged.length) {
+          const defaultMsg = lastFilesChanged.length === 1
+            ? `Updated ${lastFilesChanged[0]}`
+            : `Updated ${lastFilesChanged.length} files`;
+          commitTextarea.value = defaultMsg;
+        }
       }
 
       if (msg.status === "init-success") {
@@ -152,6 +177,14 @@
 
       if (msg.status === "push-failed") {
         output.innerText = `❌ Failed to push: ${msg.error}`;
+      }
+
+      if (msg.status === "commit-success") {
+        output.innerText = "✅ Changes committed successfully!";
+      }
+
+      if (msg.status === "commit-failed") {
+        output.innerText = `❌ Commit failed: ${msg.error}`;
       }
     });
 
