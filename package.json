@@ -1,0 +1,28 @@
+{
+  "name": "smart-commit-reviewer",
+  "displayName": "Smart Commit Reviewer",
+  "description": "Generate smart commit messages based on file changes.",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "activationEvents": ["onCommand:extension.generateCommit"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.generateCommit",
+        "title": "Generate Smart Commit Message"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "tsc -p ./",
+    "compile": "tsc -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.0",
+    "typescript": "^5.2.2",
+    "@types/vscode": "^1.85.0"
+  }
+}
