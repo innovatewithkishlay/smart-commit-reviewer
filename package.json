@@ -6,13 +6,20 @@
   "engines": {
     "vscode": "^1.85.0"
   },
-  "activationEvents": ["onCommand:extension.generateCommit"],
+  "activationEvents": [
+    "onCommand:extension.generateCommit",
+    "onCommand:extension.openGitUI"             
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "extension.generateCommit",
         "title": "Generate Smart Commit Message"
+      },
+      {
+        "command": "extension.openGitUI",      
+        "title": "Open Git Assistant"
       }
     ]
   },
