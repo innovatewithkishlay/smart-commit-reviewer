@@ -1,0 +1,15 @@
+# Smart Commit Reviewer
+
+A VS Code extension to auto-generate a meaningful commit message by analyzing git diff.
+
+## Features
+
+- Shows files modified/staged
+- Suggests a clean commit message
+- Copy or commit directly
+
+## How to Use
+
+1. Stage your changes (`git add .`)
+2. Run `Generate Smart Commit Message` from Command Palette
+3. Accept or copy the suggestion
