@@ -21,7 +21,7 @@
 
 ### Option 1: Install via `.vsix` (recommended for now)
 
-1. [Download the latest `.vsix` release here](https://github.com/your-username/smart-commit-reviewer/releases)
+1. [Download the latest `.vsix` release here](https://github.com/innovatewithkishlay/smart-commit-reviewer/releases)
 2. Open VS Code
 3. Press `Ctrl+Shift+P` → search: `Install from VSIX`
 4. Select the downloaded `.vsix` file
