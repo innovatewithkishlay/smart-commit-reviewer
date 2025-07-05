@@ -1,15 +1,62 @@
-# Smart Commit Reviewer
+# 🚀 Smart Commit Reviewer
 
-A VS Code extension to auto-generate a meaningful commit message by analyzing git diff.
+**Smart Commit Reviewer** is a VS Code extension to help developers quickly manage their Git workflow — from `git init` to `commit` and `push`, all with a beautiful UI.
 
-## Features
+> Ideal for beginners, fast development, or those tired of typing `git` commands manually.
 
-- Shows files modified/staged
-- Suggests a clean commit message
-- Copy or commit directly
+---
 
-## How to Use
+## ✨ Features
 
-1. Stage your changes (`git add .`)
-2. Run `Generate Smart Commit Message` from Command Palette
-3. Accept or copy the suggestion
+- Detect if Git is initialized in your project
+- One-click `git init`
+- Set remote origin and branch from the UI
+- View changed files before committing
+- Suggested commit messages (editable)
+- Git add + commit + push, all in one click
+
+---
+
+## 📦 Installation
+
+### Option 1: Install via `.vsix` (recommended for now)
+
+1. [Download the latest `.vsix` release here](https://github.com/your-username/smart-commit-reviewer/releases)
+2. Open VS Code
+3. Press `Ctrl+Shift+P` → search: `Install from VSIX`
+4. Select the downloaded `.vsix` file
+
+---
+
+## 🖼️ Screenshots
+
+> (Will Add images later to show UI & features)
+
+---
+
+## 📌 Planned Features
+
+- Git log viewer
+- Branch switcher
+- AI-based commit suggestions
+- Per-file visual diffs
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions!
+
+See [`CONTRIBUTING.md`](./.github/CONTRIBUTING.md) for how to get started.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License. See [`LICENSE`](./LICENSE) for details.
+
+---
+
+## 🌐 Author
+
+Made with ❤️ by [Kishlay Kumar](https://github.com/your-github-username)
