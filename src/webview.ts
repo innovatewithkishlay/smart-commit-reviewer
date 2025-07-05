@@ -75,6 +75,27 @@ export function openGitPanel(context: vscode.ExtensionContext) {
         });
         break;
       }
+      case 'commitChanges': {
+        const { commitMessage } = message;
+        if (!commitMessage || commitMessage.trim() === '') {
+          panel.webview.postMessage({ status: 'commit-failed', error: 'Empty commit message' });
+          return;
+        }
+        exec(`git add .`, { cwd }, (addErr) => {
+          if (addErr) {
+            panel.webview.postMessage({ status: 'commit-failed', error: 'git add failed' });
+          } else {
+            exec(`git commit -m "${commitMessage}"`, { cwd }, (commitErr) => {
+              if (commitErr) {
+                panel.webview.postMessage({ status: 'commit-failed', error: commitErr.message });
+              } else {
+                panel.webview.postMessage({ status: 'commit-success' });
+              }
+            });
+          }
+        });
+        break;
+      }
     }
   });
 }
