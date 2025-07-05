@@ -17,22 +17,54 @@ export function openGitPanel(context: vscode.ExtensionContext) {
   const html = fs.readFileSync(mediaPath, 'utf-8');
   panel.webview.html = html;
 
-  panel.webview.onDidReceiveMessage(
-    (message) => {
-      switch (message.command) {
-        case 'checkGit':
-          const folder = vscode.workspace.workspaceFolders?.[0].uri.fsPath || '';
-          exec('git rev-parse --is-inside-work-tree', { cwd: folder }, (err) => {
-            if (err) {
-              panel.webview.postMessage({ status: 'not-initialized' });
-            } else {
-              panel.webview.postMessage({ status: 'initialized' });
-            }
-          });
-          break;
+  const cwd = vscode.workspace.workspaceFolders?.[0].uri.fsPath || '';
+
+  panel.webview.onDidReceiveMessage(async (message) => {
+    switch (message.command) {
+      case 'checkGit': {
+        exec('git rev-parse --is-inside-work-tree', { cwd }, (err) => {
+          if (err) {
+            panel.webview.postMessage({ status: 'not-initialized' });
+          } else {
+            exec('git status --short', { cwd }, (err, stdout) => {
+              const changes = stdout.trim().split('\n').filter(Boolean);
+              panel.webview.postMessage({ status: 'initialized', changes });
+            });
+          }
+        });
+        break;
       }
-    },
-    undefined,
-    context.subscriptions
-  );
+      case 'runGitInit': {
+        exec('git init', { cwd }, (err) => {
+          if (err) {
+            panel.webview.postMessage({ status: 'init-failed' });
+          } else {
+            panel.webview.postMessage({ status: 'init-success' });
+          }
+        });
+        break;
+      }
+      case 'setRemote': {
+        const { repoUrl } = message;
+        exec(`git remote add origin ${repoUrl}`, { cwd }, (err) => {
+          if (err) {
+            panel.webview.postMessage({ status: 'remote-failed' });
+          } else {
+            panel.webview.postMessage({ status: 'remote-set' });
+          }
+        });
+        break;
+      }
+      case 'setBranch': {
+        exec(`git branch -M main`, { cwd }, (err) => {
+          if (err) {
+            panel.webview.postMessage({ status: 'branch-failed' });
+          } else {
+            panel.webview.postMessage({ status: 'branch-set' });
+          }
+        });
+        break;
+      }
+    }
+  });
 }
