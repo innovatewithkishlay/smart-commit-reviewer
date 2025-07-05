@@ -5,51 +5,143 @@
   <title>Git Assistant</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       padding: 20px;
-      color: #333;
+      background: #f9f9f9;
     }
     h2 {
       color: #007acc;
     }
+    button, input {
+      padding: 8px 12px;
+      margin-top: 10px;
+      margin-bottom: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      display: block;
+    }
     button {
-      padding: 8px 14px;
-      margin-top: 12px;
       background-color: #007acc;
       color: white;
-      border: none;
-      border-radius: 5px;
       cursor: pointer;
     }
-    #status {
-      margin-top: 10px;
-      font-weight: bold;
+    #output {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    li {
+      font-family: monospace;
     }
   </style>
 </head>
 <body>
   <h2>🚀 Git Assistant</h2>
-  <p>Click below to check if Git is initialized in this project:</p>
-  <button onclick="checkGit()">Check Git Status</button>
-  <div id="status">🔍 Waiting for action...</div>
+
+  <div id="init-section">
+    <p>🔍 Checking Git status...</p>
+    <button id="checkGitBtn">Recheck Git Status</button>
+  </div>
+
+  <div id="init-options" style="display: none;">
+    <button id="gitInitBtn">Run git init</button>
+  </div>
+
+  <div id="repo-setup" style="display: none;">
+    <input type="text" id="repoUrlInput" placeholder="Enter remote repository URL..." />
+    <button id="setRemoteBtn">Set Remote Origin</button>
+    <button id="setBranchBtn">Set Branch to main</button>
+  </div>
+
+  <div id="changes-section" style="display: none;">
+    <h3>📄 Changed Files:</h3>
+    <ul id="changedFiles"></ul>
+  </div>
+
+  <div id="output"></div>
 
   <script>
     const vscode = acquireVsCodeApi();
 
-    function checkGit() {
-      vscode.postMessage({ command: 'checkGit' });
-      document.getElementById('status').textContent = 'Checking...';
-    }
+    const initSection = document.getElementById("init-section");
+    const initOptions = document.getElementById("init-options");
+    const repoSetup = document.getElementById("repo-setup");
+    const output = document.getElementById("output");
+    const changesSection = document.getElementById("changes-section");
+    const changedFiles = document.getElementById("changedFiles");
 
-    window.addEventListener('message', event => {
-      const message = event.data;
-      const statusEl = document.getElementById('status');
-      if (message.status === 'initialized') {
-        statusEl.textContent = '✅ Git is initialized in this repo.';
-      } else if (message.status === 'not-initialized') {
-        statusEl.textContent = '❌ Git is NOT initialized. You can run "git init".';
+    document.getElementById("checkGitBtn").onclick = () => {
+      output.innerText = "";
+      vscode.postMessage({ command: "checkGit" });
+    };
+
+    document.getElementById("gitInitBtn").onclick = () => {
+      output.innerText = "Initializing Git...";
+      vscode.postMessage({ command: "runGitInit" });
+    };
+
+    document.getElementById("setRemoteBtn").onclick = () => {
+      const repoUrl = document.getElementById("repoUrlInput").value;
+      if (repoUrl) {
+        vscode.postMessage({ command: "setRemote", repoUrl });
+        output.innerText = "Setting remote...";
+      }
+    };
+
+    document.getElementById("setBranchBtn").onclick = () => {
+      vscode.postMessage({ command: "setBranch" });
+      output.innerText = "Setting branch to main...";
+    };
+
+    window.addEventListener("message", (event) => {
+      const msg = event.data;
+
+      if (msg.status === "not-initialized") {
+        initSection.innerHTML = "<p>❌ Git is NOT initialized in this workspace.</p>";
+        initOptions.style.display = "block";
+        repoSetup.style.display = "none";
+        changesSection.style.display = "none";
+      }
+
+      if (msg.status === "initialized") {
+        initSection.innerHTML = "<p>✅ Git is initialized in this workspace.</p>";
+        initOptions.style.display = "none";
+        repoSetup.style.display = "none";
+        changesSection.style.display = "block";
+        changedFiles.innerHTML = msg.changes.length
+          ? msg.changes.map(c => `<li>${c}</li>`).join('')
+          : "<li>No changes detected</li>";
+      }
+
+      if (msg.status === "init-success") {
+        output.innerText = "✅ Git initialized successfully!";
+        repoSetup.style.display = "block";
+      }
+
+      if (msg.status === "init-failed") {
+        output.innerText = "❌ Failed to initialize Git.";
+      }
+
+      if (msg.status === "remote-set") {
+        output.innerText = "✅ Remote origin set.";
+      }
+
+      if (msg.status === "remote-failed") {
+        output.innerText = "❌ Failed to set remote origin.";
+      }
+
+      if (msg.status === "branch-set") {
+        output.innerText = "✅ Branch set to main.";
+      }
+
+      if (msg.status === "branch-failed") {
+        output.innerText = "❌ Failed to set branch.";
       }
     });
+
+    vscode.postMessage({ command: "checkGit" });
   </script>
 </body>
 </html>
