@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Git Assistant</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      color: #333;
+    }
+    h2 {
+      color: #007acc;
+    }
+    button {
+      padding: 8px 14px;
+      margin-top: 12px;
+      background-color: #007acc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #status {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>🚀 Git Assistant</h2>
+  <p>Click below to check if Git is initialized in this project:</p>
+  <button onclick="checkGit()">Check Git Status</button>
+  <div id="status">🔍 Waiting for action...</div>
+
+  <script>
+    const vscode = acquireVsCodeApi();
+
+    function checkGit() {
+      vscode.postMessage({ command: 'checkGit' });
+      document.getElementById('status').textContent = 'Checking...';
+    }
+
+    window.addEventListener('message', event => {
+      const message = event.data;
+      const statusEl = document.getElementById('status');
+      if (message.status === 'initialized') {
+        statusEl.textContent = '✅ Git is initialized in this repo.';
+      } else if (message.status === 'not-initialized') {
+        statusEl.textContent = '❌ Git is NOT initialized. You can run "git init".';
+      }
+    });
+  </script>
+</body>
+</html>
