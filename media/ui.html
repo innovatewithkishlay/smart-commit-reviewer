@@ -58,6 +58,7 @@
   <div id="changes-section" style="display: none;">
     <h3>📄 Changed Files:</h3>
     <ul id="changedFiles"></ul>
+    <button id="pushBtn">Push to GitHub</button>
   </div>
 
   <div id="output"></div>
@@ -93,6 +94,11 @@
     document.getElementById("setBranchBtn").onclick = () => {
       vscode.postMessage({ command: "setBranch" });
       output.innerText = "Setting branch to main...";
+    };
+
+    document.getElementById("pushBtn").onclick = () => {
+      vscode.postMessage({ command: "pushChanges" });
+      output.innerText = "Pushing to GitHub...";
     };
 
     window.addEventListener("message", (event) => {
@@ -138,6 +144,14 @@
 
       if (msg.status === "branch-failed") {
         output.innerText = "❌ Failed to set branch.";
+      }
+
+      if (msg.status === "push-success") {
+        output.innerText = "✅ Successfully pushed to GitHub!";
+      }
+
+      if (msg.status === "push-failed") {
+        output.innerText = `❌ Failed to push: ${msg.error}`;
       }
     });
 
